@@ -1,4 +1,4 @@
-module grpc-vs-nats-benchmark
+module github.com/dansonserge/grpc-vs-nats-benchmark-golang
 
 go 1.24.1
 

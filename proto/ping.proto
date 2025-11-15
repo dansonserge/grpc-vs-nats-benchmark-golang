@@ -1,0 +1,16 @@
+syntax = "proto3";
+package ping;
+
+option go_package = "grpc-vs-nats-benchmark/proto;proto";
+
+message PingRequest {
+  bytes payload = 1;
+}
+
+message PingResponse {
+  bytes payload = 1;
+}
+
+service PingService {
+  rpc Ping(PingRequest) returns (PingResponse) {}
+}
