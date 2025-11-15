@@ -1,0 +1,42 @@
+version: "3.9"
+
+services:
+  nats:
+    image: nats:2.10
+    container_name: nats-core
+    ports:
+      - "4222:4222"
+    networks:
+      - bench-net
+
+  grpc-server:
+    build:
+      context: .
+      dockerfile: Dockerfile.grpc
+    container_name: grpc-server
+    ports:
+      - "50051:50051"
+    depends_on:
+      - nats
+    networks:
+      - bench-net
+
+  benchmark:
+    build:
+      context: .
+      dockerfile: Dockerfile.benchmark
+    container_name: benchmark
+    depends_on:
+      - grpc-server
+      - nats
+    networks:
+      - bench-net
+    environment:
+      GRPC_ADDR: "grpc-server:50051"
+      NATS_ADDR: "nats:4222"
+    volumes:
+      - ./results:/app/results
+
+networks:
+  bench-net:
+    driver: bridge

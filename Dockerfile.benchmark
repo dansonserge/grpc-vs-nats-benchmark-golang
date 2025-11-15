@@ -1,0 +1,36 @@
+FROM golang:1.24 AS builder
+
+WORKDIR /app
+
+COPY go.mod go.sum ./
+RUN go mod download
+
+COPY . .
+
+RUN CGO_ENABLED=0 GOOS=linux go build -o bench-runner ./cmd/bench-runner
+
+FROM alpine:3.19
+
+WORKDIR /app
+
+COPY --from=builder /app/bench-runner ./bench-runner
+RUN mkdir -p results
+
+ENV GRPC_ADDR=grpc-server:50051
+ENV NATS_ADDR=nats:4222
+ENV MODE=grpc
+ENV REQUESTS=50000
+ENV CONCURRENCY=200
+ENV PAYLOAD_SIZE=16
+ENV TIMEOUT_MS=500
+
+EXPOSE 8080
+
+CMD ./bench-runner \
+    --mode="$MODE" \
+    --target="$GRPC_ADDR" \
+    --nats_url="$NATS_ADDR" \
+    --requests="$REQUESTS" \
+    --concurrency="$CONCURRENCY" \
+    --payload_size="$PAYLOAD_SIZE" \
+    --timeout="${TIMEOUT_MS}ms"

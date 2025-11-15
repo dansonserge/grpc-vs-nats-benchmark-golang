@@ -1,0 +1,21 @@
+FROM golang:1.24 AS builder
+
+WORKDIR /app
+
+COPY go.mod go.sum ./
+RUN go mod download
+
+COPY . .
+
+# Update path to match your structure
+RUN CGO_ENABLED=0 GOOS=linux go build -o nats-server ./cmd/nats-server
+
+FROM alpine:3.19
+
+WORKDIR /app
+
+COPY --from=builder /app/nats-server ./nats-server
+
+EXPOSE 4222
+
+CMD ["./nats-server"]

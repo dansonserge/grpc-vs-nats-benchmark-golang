@@ -2,17 +2,18 @@ package bench
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"log"
+	"os"
 	"sort"
 	"sync"
 	"time"
-	"encoding/json"
-	"os"
-	"log"
 
 	pb "grpc-vs-nats-benchmark-golang/proto"
-	"google.golang.org/grpc"
+
 	"github.com/nats-io/nats.go"
+	"google.golang.org/grpc"
 )
 
 type result struct {
@@ -52,8 +53,7 @@ func stats(durs []int64, total time.Duration, reqs int, conc int) {
 	max := time.Duration(durs[len(durs)-1])
 	opsec := float64(reqs) / total.Seconds()
 
-	fmt.Printf("requests=%d concurrency=%d avg=%v p50=%v p95=%v p99=%v max=%v ops/sec=%.2f
-",
+	fmt.Printf("requests=%d concurrency=%d avg=%v p50=%v p95=%v p99=%v max=%v ops/sec=%.2f",
 		reqs, conc, avg, p50, p95, p99, max, opsec)
 }
 
@@ -92,7 +92,9 @@ func RunGRPC(client grpcClient, payload []byte, requests int, concurrency int, t
 	close(ch)
 
 	durs := make([]int64, 0, requests)
-	for v := range ch { durs = append(durs, v) }
+	for v := range ch {
+		durs = append(durs, v)
+	}
 
 	stats(durs, total, requests, concurrency)
 	r := result{"grpc", requests, concurrency, len(payload), durs, total}
@@ -128,7 +130,13 @@ func RunNATS(nc *nats.Conn, subject string, payload []byte, requests int, concur
 	close(ch)
 
 	durs := make([]int64, 0, requests)
-	for v := range ch { durs = append(durs, v) }
+	for v := range ch {
+		durs = append(durs, v)
+	}
 
 	stats(durs, total, requests, concurrency)
 	r := result{"nats", requests, concurrency, len(payload), durs, total}
+
+	fmt.Printf("NATS benchmark result: %+v\n", r)
+	saveResults(r, "nats")
+}
