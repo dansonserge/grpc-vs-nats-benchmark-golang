@@ -3,7 +3,7 @@ package grpc_server
 import (
 	"context"
 
-	pb "github.com/dansonserge/grpc-vs-nats-benchmark-golang"
+	pb "grpc-vs-nats-benchmark-golang/proto"
 )
 
 // Server implements PingService

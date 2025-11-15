@@ -5,9 +5,9 @@ import (
 	"log"
 	"net"
 
-	"github.com/dansonserge/grpc-vs-nats-benchmark-golang/internal/grpc_server"
+	"grpc-vs-nats-benchmark-golang/internal/grpc_server"
 
-	pb "github.com/dansonserge/grpc-vs-nats-benchmark-golang/proto"
+	pb "grpc-vs-nats-benchmark-golang/proto"
 
 	"google.golang.org/grpc"
 )

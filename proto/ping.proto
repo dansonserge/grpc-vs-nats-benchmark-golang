@@ -1,7 +1,7 @@
 syntax = "proto3";
 package ping;
 
-option go_package = "grpc-vs-nats-benchmark/proto;proto";
+option go_package = "grpc-vs-nats-benchmark-golang/proto;proto";
 
 message PingRequest {
   bytes payload = 1;
